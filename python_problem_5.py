@@ -5,7 +5,7 @@ Read a list of commands in RAM and use a set of registers to execute them
 """
 import file_reader as fr
 
-class Problem5:
+class RamProcessor:
 
     def __init__(self):
         self.register = [0 for i in range(10)]
@@ -68,7 +68,7 @@ class Problem5:
             case 9:
                 self.ram[self.instruction_digit3] = self.register[self.instruction_digit2]
                 self.ram[self.instruction_digit3] = (self.ram[self.instruction_digit3] % 1000)
-        return 0
+        return 1
 
     def get_ram_contents(self):
         return self.ram
@@ -81,22 +81,27 @@ def execute_main():
     ram_current_location = 0
     ram_instruction = 0
     instruction_count = 0
-    return_instruction = 0
-    problem5 = Problem5()
+    continue_loop = 1
+    problem5 = RamProcessor()
     ram = problem5.read_ram()
     ram_instruction = ram[0]
 
     while ram_instruction != 100 and ram_current_location < 1000:
-        return_instruction = problem5.instruction_router(ram[ram_current_location])
-        if return_instruction == 0:
+        continue_loop = problem5.instruction_router(ram[ram_current_location])
+        if continue_loop == 1:
             ram = problem5.get_ram_contents()
+            #check if command starts with 0 as that can move instruction counter
             if int(ram_instruction/100) == 0:
+                #update counter
                 ram_current_location = problem5.update_ram_counter()
             else:
+                #else simply increment counter
                 ram_current_location += 1
             ram_instruction = ram[ram_current_location]
             instruction_count += 1
         else:
+            #this is the case where a s contains 0 in command 0ds (goto d unless s contains 0). It's unclear from the problem statement
+            #should happen here. So, move on to next ram location
             ram_current_location += 1
             ram_instruction = ram[ram_current_location]
             instruction_count += 1
